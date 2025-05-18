@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python API 实验指南</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#0A2463',
+            accent: '#3E92CC',
+            neutral: '#F5F7FA',
+            dark: '#1E293B',
+            success: '#22C55E',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+            info: '#06B6D4'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .step-number {
+        @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm mr-3;
+      }
+      .code-block {
+        @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono;
+      }
+      .nav-link {
+        @apply text-gray-700 hover:text-primary font-medium transition-colors duration-200;
+      }
+      .lab-card {
+        @apply bg-white rounded-xl shadow-lg overflow-hidden card-hover mb-8;
+      }
+      .lab-header {
+        @apply p-6 border-l-4 flex items-center;
+      }
+      .lab-title {
+        @apply text-xl font-bold text-gray-900 flex items-center;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800">
+  <!-- 导航栏 -->
+  <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300" id="navbar">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <i class="fa-solid fa-database text-primary text-2xl mr-3"></i>
+          <span class="text-xl font-bold text-primary">Python API 实验指南</span>
+        </div>
+        
+        <nav class="hidden md:flex space-x-8">
+          <a href="#lab1" class="nav-link">实验一</a>
+          <a href="#lab2" class="nav-link">实验二</a>
+          <a href="#lab3" class="nav-link">实验三</a>
+          <a href="#lab4" class="nav-link">实验四</a>
+          <a href="#lab5" class="nav-link">实验五</a>
+          <a href="#lab6" class="nav-link">实验六</a>
+          <a href="#lab7" class="nav-link">实验七</a>
+          <a href="#lab8" class="nav-link">实验八</a>
+          <a href="#lab9" class="nav-link">实验九</a>
+        </nav>
+        
+        <div class="md:hidden">
+          <button type="button" id="mobile-menu-button" class="text-gray-700 hover:text-primary focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#lab1" class="block nav-link">实验一</a>
+        <a href="#lab2" class="block nav-link">实验二</a>
+        <a href="#lab3" class="block nav-link">实验三</a>
+        <a href="#lab4" class="block nav-link">实验四</a>
+        <a href="#lab5" class="block nav-link">实验五</a>
+        <a href="#lab6" class="block nav-link">实验六</a>
+        <a href="#lab7" class="block nav-link">实验七</a>
+        <a href="#lab8" class="block nav-link">实验八</a>
+        <a href="#lab9" class="block nav-link">实验九</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区 -->
+  <section class="bg-gradient-to-r from-primary to-accent text-white py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-6 leading-tight text-shadow animate-fade-in">
+          Python API 实验指南
+        </h1>
+        <p class="text-[clamp(1rem,2vw,1.25rem)] mb-8 opacity-90 animate-fade-in" style="animation-delay: 0.2s">
+          通过实践掌握使用 Python 访问第三方 API、构建接口服务、集成数据库以及容器化部署的完整流程
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style="animation-delay: 0.4s">
+          <a href="#lab1" class="bg-white text-primary px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            开始实验 <i class="fa-solid fa-arrow-right ml-2"></i>
+          </a>
+          <a href="#environment" class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            实验环境 <i class="fa-solid fa-flask ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 实验环境 -->
+  <section id="environment" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 mb-12 scroll-mt-20">
+    <div class="lab-card">
+      <div class="lab-header bg-info/10 border-info">
+        <div class="w-12 h-12 rounded-full bg-info flex items-center justify-center text-white mr-4">
+          <i class="fa-solid fa-laptop-code text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">🛠️ 实验环境建议</h2>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <h3 class="font-semibold text-lg mb-3 flex items-center">
+              <i class="fa-brands fa-ubuntu text-info mr-2"></i> Ubuntu 虚拟机
+            </h3>
+            <p class="text-gray-600">推荐使用最新 LTS 版本，预装 Docker 环境</p>
+          </div>
+          
+          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <h3 class="font-semibold text-lg mb-3 flex items-center">
+              <i class="fa-solid fa-database text-info mr-2"></i> PostgreSQL
+            </h3>
+            <p class="text-gray-600">关系型数据库，用于存储实验数据</p>
+          </div>
+          
+          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <h3 class="font-semibold text-lg mb-3 flex items-center">
+              <i class="fa-solid fa-code text-info mr-2"></i> 开发工具
+            </h3>
+            <p class="text-gray-600">Python 3.10+、pgAdmin、Postman 或类似工具</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 实验列表 -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- 实验一 -->
+    <section id="lab1" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-microscope text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验一：使用 `requests` 访问第三方 API 并处理数据</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>掌握 Python `requests` 的基本用法</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>能够从 API 中获取数据并解析返回结果</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>了解第三方 API 密钥的申请与使用流程</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    安装 requests 库
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令安装 requests 库：</p>
+                  <pre class="code-block">pip install requests</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    获取 WeatherAPI 密钥
+                  </h4>
+                  <p class="text-gray-600 mt-2">访问 <a href="https://www.weatherapi.com/" target="_blank" class="text-primary hover:underline">WeatherAPI 官网</a> 注册免费账号，获取每日 1000 次调用的 API 密钥。</p>
+                  <p class="text-gray-600 mt-2">注意：生产环境需根据需求升级套餐。</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    编写 Python 脚本（weather_demo.py）
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 weather_demo.py 的 Python 脚本，内容如下：</p>
+                  <pre class="code-block">import requests
+
+url = "https://api.weatherapi.com/v1/current.json"
+params = {
+    "key": "your_actual_api_key",  # 替换为控制台获取的密钥
+    "q": "Guangzhou",
+    "aqi": "no"  # 可选参数：关闭空气质量数据以减少响应体积
+}
+
+response = requests.get(url, params=params)
+response.raise_for_status()  # 自动抛出 HTTP 错误
+data = response.json()
+
+print(f"城市：{data['location']['name']}")
+print(f"温度：{data['current']['temp_c']} °C")
+print(f"天气状况：{data['current']['condition']['text']}")</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 15 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">API基础</span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">数据处理</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验二 -->
+    <section id="lab2" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-server text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验二：构建 Flask 接口服务供智能体平台调用</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>使用 Flask 创建基本 Web 接口</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>接收参数并返回 JSON 响应</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    安装 Flask
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令安装 Flask：</p>
+                  <pre class="code-block">pip install flask</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    编写 API 服务（app.py）
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 app.py 的 Python 脚本，内容如下：</p>
+                  <pre class="code-block">from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/echo', methods=['POST'])
+def echo():
+    content = request.json
+    return jsonify({"received": content})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    启动服务并用 Postman 或 curl 测试
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中运行脚本，启动服务：</p>
+                  <pre class="code-block">python app.py</pre>
+                  <p class="text-gray-600 mt-2">使用 Postman 或 curl 发送 POST 请求测试接口：</p>
+                  <pre class="code-block">curl -X POST -H "Content-Type: application/json" -d '{"message": "Hello, Flask!"}' http://localhost:5000/echo</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 20 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Web服务</span>
+              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Flask</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验三 -->
+    <section id="lab3" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-database text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验三：集成 Flask + SQLAlchemy + PostgreSQL 实现数据库写入</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>创建数据库模型</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>写入和查询 PostgreSQL 数据</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>实践数据库安全最佳实践</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    安装依赖
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令安装所需依赖：</p>
+                  <pre class="code-block">pip install flask flask_sqlalchemy psycopg2-binary</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    创建 PostgreSQL 专用用户
+                  </h4>
+                  <p class="text-gray-600 mt-2">使用以下 SQL 命令创建专用用户和数据库：</p>
+                  <pre class="code-block">CREATE USER flask_app WITH LOGIN PASSWORD 'strong_password';
+CREATE DATABASE testdb OWNER flask_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO flask_app;</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    数据库配置示例（app.py）
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 app.py 的 Python 脚本，内容如下：</p>
+                  <pre class="code-block">from flask import Flask, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import os
+from datetime import timedelta
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{os.getenv('FLASK_DB_USER', 'flask_app')}:{os.getenv('FLASK_DB_PASSWORD', 'strong_password')}@localhost:5432/{os.getenv('FLASK_DB_NAME', 'testdb')}"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+@app.route('/add_user/<name>')
+def add_user(name):
+    try:
+        user = User(name=name)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'status': 'ok', 'user_id': user.id, 'created_at': user.created_at.isoformat()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'数据库操作失败：{str(e)}'}), 500
+
+if __name__ == '__main__':
+    with app.app_context():
+        try:
+            db.create_all()
+            print("数据库初始化完成")
+        except Exception as e:
+            print(f'初始化数据库失败：{str(e)}')
+    app.run(host='0.0.0.0', port=5000)</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">4</span>
+                    使用 pgAdmin 查看写入记录
+                  </h4>
+                  <p class="text-gray-600 mt-2">访问 <a href="http://localhost:5050" target="_blank" class="text-primary hover:underline">pgAdmin</a>，连接到 PostgreSQL 数据库，查看写入的用户记录。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 30 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">数据库</span>
+              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">SQLAlchemy</span>
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">PostgreSQL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验四 -->
+    <section id="lab4" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-brands fa-docker text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验四：使用 Docker 容器运行 Flask 应用</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>编写 Dockerfile 构建 Flask 容器</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>运行并验证服务</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>实践镜像优化与安全加固</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    创建 requirements.txt
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 requirements.txt 的文件，内容如下：</p>
+                  <pre class="code-block">flask==2.3.3
+psycopg2-binary==2.9.7  # 若使用实验三需添加</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    Dockerfile 示例（安全加固版）
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 Dockerfile 的文件，内容如下：</p>
+                  <pre class="code-block">FROM python:3.10-slim
+WORKDIR /app
+
+# 创建非 root 用户
+RUN groupadd -S app && useradd -S app -G app
+RUN chown -R app:app /app
+USER app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+
+CMD ["python", "app.py"]</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    构建与运行
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令构建并运行 Docker 容器：</p>
+                  <pre class="code-block">docker build -t flask-demo .
+docker run -p 5000:5000 --user app flask-demo</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 25 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">容器化</span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">Docker</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验五 -->
+    <section id="lab5" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-sitemap text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验五：使用 docker-compose 一键部署 Flask + PostgreSQL + pgAdmin</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>掌握 `docker-compose` 多服务编排能力</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>实现服务间依赖管理与健康检查</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>快速启动包含数据库和管理工具的完整开发环境</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    编写 docker-compose.yml
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 docker-compose.yml 的文件，内容如下：</p>
+                  <pre class="code-block">version: '3.9'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DB_USER=flask_app
+      - FLASK_DB_PASSWORD=strong_password
+      - FLASK_DB_NAME=testdb
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: flask_app
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flask_app -d testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@demo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:  # 持久化数据库数据
+  pgadmin_data:   # 持久化 pgAdmin 配置</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    构建并运行
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令构建并运行服务：</p>
+                  <pre class="code-block">docker-compose up --build</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    浏览器访问
+                  </h4>
+                  <p class="text-gray-600 mt-2">通过浏览器访问以下地址验证服务：</p>
+                  <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>Flask 接口：<a href="http://localhost:5000" target="_blank" class="text-primary hover:underline">http://localhost:5000</a></li>
+                    <li>pgAdmin：<a href="http://localhost:5050" target="_blank" class="text-primary hover:underline">http://localhost:5050</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 35 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">编排</span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">Docker</span>
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">PostgreSQL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验六 -->
+    <section id="lab6" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-share-alt text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验六：导出与导入 Docker 镜像（便于线下传播）</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>理解如何在离线环境中共享镜像</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    导出镜像（包含标签）
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令导出 Docker 镜像：</p>
+                  <pre class="code-block">docker tag flask-demo:latest flask-demo:v1.0
+docker save flask-demo:v1.0 > flask-demo-v1.0.tar</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    拷贝至另一虚拟机后导入
+                  </h4>
+                  <p class="text-gray-600 mt-2">将导出的 tar 文件拷贝到另一台虚拟机后，执行以下命令导入镜像：</p>
+                  <pre class="code-block">docker load < flask-demo-v1.0.tar
+docker tag $(docker images -q flask-demo:latest) flask-demo:v1.0</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    运行指定版本镜像
+                  </h4>
+                  <p class="text-gray-600 mt-2">执行以下命令运行导入的镜像：</p>
+                  <pre class="code-block">docker run -p 5000:5000 flask-demo:v1.0</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 15 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">镜像管理</span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">Docker</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验七 -->
+    <section id="lab7" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-link text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验七：智能体平台与 Flask 接口的联动测试</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>模拟智能体调用自建 API 的完整流程</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>实现认证与权限控制</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    新增智能体专用接口（带权限验证）
+                  </h4>
+                  <p class="text-gray-600 mt-2">在 app.py 中添加以下代码：</p>
+                  <pre class="code-block">from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@app.route('/agent/process', methods=['POST'])
+@jwt_required()
+def agent_process():
+    current_user = get_jwt_identity()
+    task = request.json.get('task')
+    if task == "get_user_list":
+        # 限制智能体仅能获取前10条数据
+        users = User.query.order_by(User.created_at.desc()).limit(10).all()
+        return jsonify([{'id': u.id, 'name': u.name, 'created_at': u.created_at.isoformat()} for u in users])
+    elif task == "ping":
+        return jsonify({'status': 'pong', 'timestamp': datetime.now().isoformat()})
+    return jsonify({'error': '非法任务'}), 403</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    在智能体平台配置 API 调用规则
+                  </h4>
+                  <p class="text-gray-600 mt-2">在智能体平台配置以下 API 调用规则：</p>
+                  <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>请求地址：<code>http://localhost:5000/agent/process</code></li>
+                    <li>请求头：<code>Authorization: Bearer &lt;JWT_TOKEN&gt;</code></li>
+                    <li>请求体：<code>{"task": "get_user_list"}</code></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 25 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">集成测试</span>
+              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">智能体</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验八 -->
+    <section id="lab8" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-shield-alt text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验八：使用 JWT 实现接口认证（生产增强版）</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>为 Flask 接口添加认证机制</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>实现令牌过期、刷新和黑名单功能</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    安装依赖
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令安装所需依赖：</p>
+                  <pre class="code-block">pip install flask-jwt-extended==4.4.4 python-dotenv</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    创建 `.env` 文件
+                  </h4>
+                  <p class="text-gray-600 mt-2">创建一个名为 .env 的文件，内容如下：</p>
+                  <pre class="code-block">JWT_SECRET_KEY=your_secure_jwt_secret_here
+JWT_ACCESS_TOKEN_EXPIRES=3600  # 有效期（秒）</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    修改 app.py
+                  </h4>
+                  <p class="text-gray-600 mt-2">修改 app.py 文件，添加 JWT 认证功能：</p>
+                  <pre class="code-block">from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required, get_jwt_identity,
+    set_access_cookies, unset_jwt_cookies, create_refresh_token,
+    get_jwt
+)
+import os
+from dotenv import load_dotenv
+from datetime import timedelta
+
+load_dotenv()  # 加载环境变量
+app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600)))
+app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']  # 支持 Cookie 和 Header 携带令牌
+app.config['JWT_COOKIE_SECURE'] = True  # 生产环境设为 True（HTTPS 专用）
+jwt = JWTManager(app)
+
+# 示例用户模型（实际需从数据库查询）
+USERS = {
+    "agent_user": "agent_pass",
+    "admin": "super_secret"
+}
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username in USERS and USERS[username] == password:
+        access_token = create_access_token(identity=username)
+        refresh_token = create_refresh_token(identity=username)
+        response = jsonify({"message": "登录成功"})
+        set_access_cookies(response, access_token)
+        set_access_cookies(response, refresh_token)
+        return response, 200
+    return jsonify({"error": "认证失败"}), 401
+
+@app.route('/protected_data', methods=['GET'])
+@jwt_required()
+def protected_data():
+    user = get_jwt_identity()
+    return jsonify({"user": user, "message": "这是受保护的资源"}), 200
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    response = jsonify({"message": "注销成功"})
+    unset_jwt_cookies(response)
+    return response, 200</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 30 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">安全</span>
+              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">JWT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验九 -->
+    <section id="lab9" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-primary/10 border-primary">
+          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-shipping-fast text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🧪 实验九：Docker 镜像分层构建与安全扫描</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-target text-primary mr-2"></i> 实验目标
+              </h3>
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>通过多阶段构建减小镜像体积</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check-circle text-green-500 mt-1 mr-2"></i>
+                  <span>使用 Clair 进行漏洞扫描</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fa-solid fa-list-ol text-primary mr-2"></i> 实验步骤
+              </h3>
+              <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    Dockerfile 多阶段构建
+                  </h4>
+                  <p class="text-gray-600 mt-2">修改 Dockerfile 文件，使用多阶段构建：</p>
+                  <pre class="code-block"># 构建阶段：安装依赖
+FROM python:3.10-slim AS builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 扫描阶段：漏洞检测（可选，需提前安装 Clair）
+FROM clairtest/clair-scanner:v10
+COPY --from=builder /app /app
+RUN scan /app --ip=host --output= ClairReport.json
+
+# 运行阶段：最终镜像
+FROM python:3.10-slim
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY . .
+USER app
+CMD ["python", "app.py"]</pre>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <h4 class="font-medium flex items-center">
+                    <span class="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    构建并生成漏洞报告
+                  </h4>
+                  <p class="text-gray-600 mt-2">在命令行中执行以下命令构建镜像并生成漏洞报告：</p>
+                  <pre class="code-block">docker build -t flask-demo:v1.0 .
+docker run --rm flask-demo:v1.0 cat ClairReport.json</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <i class="fa-solid fa-clock text-primary mr-1"></i> 预计完成时间: 30 分钟
+            </div>
+            <div class="flex space-x-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">安全</span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">Docker</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 生产环境部署建议 -->
+    <section id="production" class="mb-20 scroll-mt-20">
+      <div class="lab-card">
+        <div class="lab-header bg-secondary/10 border-secondary">
+          <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white mr-4">
+            <i class="fa-solid fa-rocket text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">🚀 生产环境部署建议</h2>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <h3 class="font-semibold text-lg mb-3 flex items-center">
+                <i class="fa-solid fa-server text-secondary mr-2"></i> 使用 Gunicorn + Nginx 组合
+              </h3>
+              <pre class="code-block"># 安装 Gunicorn
+pip install gunicorn
+
+# Gunicorn 配置文件（gunicorn.conf.py）
+workers = 4
+bind = "0.0.0.0:5000"
+worker_class = "uvicorn.workers.UvicornWorker"  # 可选：使用 Uvicorn 异步 worker
+accesslog = "-"
+errorlog = "-"</pre>
+              <pre class="code-block"># Dockerfile（生产版）
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+COPY gunicorn.conf.py .
+USER app
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]</pre>
+            </div>
+            
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <h3 class="font-semibold text-lg mb-3 flex items-center">
+                <i class="fa-solid fa-lock text-secondary mr-2"></i> HTTPS 配置与 Let's Encrypt
+              </h3>
+              <pre class="code-block">server {
+    listen 443 ssl;
+    server_name your-domain.com;
+    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</pre>
+            </div>
+            
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <h3 class="font-semibold text-lg mb-3 flex items-center">
+                <i class="fa-solid fa-chart-line text-secondary mr-2"></i> 容器监控与日志聚合
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li><strong>Prometheus + Grafana</strong>：</li>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>安装 `flask-prometheus` 扩展监控接口指标</li>
+                  <li>使用 Docker 监控插件收集容器资源数据（CPU/内存/网络）</li>
+                </ul>
+                <li><strong>ELK Stack</strong>：</li>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>配置 Filebeat 收集容器日志并发送至 Logstash 处理</li>
+                  <li>在 Kibana 中创建仪表盘展示实时日志和趋势分析</li>
+                </ul>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Python API 实验指南</h3>
+          <p class="text-gray-400">通过实践掌握使用 Python 访问第三方 API、构建接口服务、集成数据库以及容器化部署的完整流程</p>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">实验导航</h3>
+          <ul class="space-y-2">
+            <li><a href="#lab1" class="text-gray-400 hover:text-white transition-colors duration-200">实验一：使用 `requests` 访问第三方 API</a></li>
+            <li><a href="#lab2" class="text-gray-400 hover:text-white transition-colors duration-200">实验二：构建 Flask 接口服务</a></li>
+            <li><a href="#lab3" class="text-gray-400 hover:text-white transition-colors duration-200">实验三：集成 Flask + SQLAlchemy + PostgreSQL</a></li>
+            <li><a href="#lab4" class="text-gray-400 hover:text-white transition-colors duration-200">实验四：使用 Docker 容器运行 Flask 应用</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">更多资源</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">实验代码仓库</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">参考文档</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">常见问题</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <i class="fa-solid fa-envelope text-primary mr-2"></i>
+              <a href="mailto:support@example.com" class="text-gray-400 hover:text-white transition-colors duration-200">support@example.com</a>
+            </li>
+            <li class="flex items-center">
+              <i class="fa-solid fa-phone text-primary mr-2"></i>
+              <a href="tel:+1234567890" class="text-gray-400 hover:text-white transition-colors duration-200">+123 456 7890</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+        <p>&copy; 2025 Python API 实验指南. 保留所有权利.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 移动端菜单切换
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('bg-white/95', 'backdrop-blur-sm');
+        navbar.classList.remove('bg-white');
+      } else {
+        navbar.classList.add('bg-white');
+        navbar.classList.remove('bg-white/95', 'backdrop-blur-sm');
+      }
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        // 关闭移动端菜单
+        if (!mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+        }
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // 为所有代码块添加复制功能
+    document.querySelectorAll('pre').forEach((pre, index) => {
+      const button = document.createElement('button');
+      button.className = 'absolute right-4 top-4 bg-gray-800 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs transition-colors duration-200 opacity-0 group-hover:opacity-100';
+      button.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> 复制';
+      button.addEventListener('click', () => {
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+          button.innerHTML = '<i class="fa-solid fa-check mr-1"></i> 已复制';
+          setTimeout(() => {
+            button.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> 复制';
+          }, 2000);
+        });
+      });
+      
+      // 为代码块添加相对定位，以便按钮正确定位
+      const parent = pre.parentElement;
+      parent.style.position = 'relative';
+      parent.style.overflow = 'hidden';
+      
+      // 只有当代码块在实验内容区域时才添加复制按钮
+      if (parent.closest('#lab1') || parent.closest('#lab2') || parent.closest('#lab3') || parent.closest('#lab4') || parent.closest('#lab5') || parent.closest('#lab6') || parent.closest('#lab7') || parent.closest('#lab8') || parent.closest('#lab9') || parent.closest('#production')) {
+        parent.appendChild(button);
+      }
+    });
+    
+    // 滚动动画
+    const animateOnScroll = () => {
+      const elements = document.querySelectorAll('.lab-card');
+      
+      elements.forEach(element => {
+        const elementPosition = element.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (elementPosition < windowHeight - 100) {
+          element.classList.add('animate-fade-in');
+        }
+      });
+    };
+    
+    // 初始加载时执行一次
+    animateOnScroll();
+    
+    // 滚动时执行
+    window.addEventListener('scroll', animateOnScroll);
+  </script>
+</body>
+</html>
+    
