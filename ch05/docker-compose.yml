@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:13  
+    container_name: db-1 
+    ports:
+      - "54320:5432"    # ✅ 显式暴露 PostgreSQL 端口
+    environment:
+      POSTGRES_USER: flask_app
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: testdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flask_app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flask-demo:1.0.0   # ✅ 设置 tag 为 1.0.0
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db   # ✅ 简化为服务级别依赖（不再检查健康）
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DB_USER=flask_app
+      - FLASK_DB_PASSWORD=strong_password
+      - FLASK_DB_NAME=testdb
+      - FLASK_DB_HOST=db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@demo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:  # 持久化数据库数据
+  pgadmin_data:   # 持久化 pgAdmin 配置
